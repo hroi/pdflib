@@ -10,6 +10,7 @@ impl Pdf {}
 /// ## Form Fields
 impl Pdf {
     /// Create a form field on the current page subject to various options.
+    #[allow(clippy::too_many_arguments)]
     pub fn create_field(
         &mut self,
         llx: f64,
