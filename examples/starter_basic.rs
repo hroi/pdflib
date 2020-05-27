@@ -32,8 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     /* use NotoSerif-Regular font with text format UTF-8 for placing the text
      * and demonstrate various options how to pass the UTF-8 text to PDFlib
      */
-    let optlist =
-        "fontname={NotoSerif-Regular} encoding=unicode embedding fontsize=24 textformat=utf8";
+    let optlist = "fontname={NotoSerif-Regular} encoding=unicode embedding fontsize=24";
 
     /* using plain ASCII text */
     p.fit_textline("en: Hello!", 50., 700., optlist)?;
@@ -45,7 +44,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     p.fit_textline("ru: Привет!", 50., 600., optlist)?;
 
     /* using PDFlib's character references */
-    let optlist = "fontname={NotoSerif-Regular} encoding=unicode embedding fontsize=24 textformat=utf8 charref=true";
+    let optlist =
+        "fontname={NotoSerif-Regular} encoding=unicode embedding fontsize=24 charref=true";
     p.fit_textline("es: &#xA1;Hola!", 50.0, 550.0, optlist)?;
 
     p.fit_image(&image, 0.0, 0.0, "scale=0.25")?;
