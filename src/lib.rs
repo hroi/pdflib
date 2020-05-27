@@ -128,6 +128,14 @@ mod tests {
 
     #[test]
     #[should_panic]
+    fn nullbyte_arg() {
+        let mut pdf = Pdf::new();
+        pdf.set_option("filename\0handling", "contains null")
+            .unwrap();
+    }
+
+    #[test]
+    #[should_panic]
     fn set_option_invalid() {
         let mut pdf = Pdf::new();
         pdf.set_option("invalid", "option").unwrap();
