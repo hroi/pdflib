@@ -1,66 +1,5 @@
 use std::fmt;
 
-pub struct Pdf {
-    inner: *mut pdflib_sys::PDF,
-}
-
-pub struct PdfError {
-    code: i32,
-    apiname: std::ffi::CString,
-    message: std::ffi::CString,
-}
-
-impl fmt::Display for PdfError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{} ({})", self.message.to_string_lossy(), self.code)
-    }
-}
-
-impl fmt::Debug for PdfError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "{} error {}: {}",
-            self.apiname.to_string_lossy(),
-            self.code,
-            self.message.to_string_lossy()
-        )
-    }
-}
-
-impl std::convert::From<std::ffi::NulError> for PdfError {
-    fn from(_: std::ffi::NulError) -> PdfError {
-        PdfError {
-            code: -1,
-            apiname: std::ffi::CString::new("").unwrap(),
-            message: std::ffi::CString::new("null bytes in input string").unwrap(),
-        }
-    }
-}
-
-impl Drop for Pdf {
-    fn drop(&mut self) {
-        unsafe {
-            pdflib_sys::PDF_delete(self.inner);
-        }
-    }
-}
-
-impl std::error::Error for PdfError {}
-
-impl Pdf {
-    pub fn new() -> Pdf {
-        unsafe {
-            let p = pdflib_sys::PDF_new();
-            assert!(!p.is_null());
-            pdflib_sys::PDF_set_option(p, "errorpolicy=return\0".as_ptr() as _);
-            let mut ret = Pdf { inner: p };
-            ret.set_option("errorpolicy", "return").unwrap();
-            ret
-        }
-    }
-}
-
 macro_rules! unsafe_try_catch {
     ($p:expr, $body:expr) => {
         unsafe {
@@ -106,20 +45,72 @@ mod multimedia;
 pub use multimedia::*;
 mod document_interchange;
 pub use document_interchange::*;
-// mod document;
-// pub use document::*;
-// mod path;
-// pub use path::*;
-// mod paint;
-// pub use paint::*;
-// mod page;
-// pub use page::*;
-// mod text;
-// pub use text::*;
-// mod exception;
-// pub use exception::*;
-// mod option;
-// pub use option::*;
+
+pub struct Pdf {
+    inner: *mut pdflib_sys::PDF,
+}
+
+impl Pdf {
+    #[allow(clippy::new_without_default)]
+    pub fn new() -> Pdf {
+        let p = unsafe {
+            let p = pdflib_sys::PDF_new();
+            assert!(
+                !p.is_null(),
+                "Couldn't create PDFlib object (out of memory)!\n"
+            );
+            p
+        };
+        let mut ret = Pdf { inner: p };
+        ret.set_option("errorpolicy", "return").unwrap();
+        ret.set_option("stringformat", "utf8").unwrap();
+        ret
+    }
+}
+
+impl Drop for Pdf {
+    fn drop(&mut self) {
+        unsafe {
+            pdflib_sys::PDF_delete(self.inner);
+        }
+    }
+}
+
+pub struct PdfError {
+    code: i32,
+    apiname: std::ffi::CString,
+    message: std::ffi::CString,
+}
+
+impl fmt::Display for PdfError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} ({})", self.message.to_string_lossy(), self.code)
+    }
+}
+
+impl fmt::Debug for PdfError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{} error {}: {}",
+            self.apiname.to_string_lossy(),
+            self.code,
+            self.message.to_string_lossy()
+        )
+    }
+}
+
+impl std::convert::From<std::ffi::NulError> for PdfError {
+    fn from(err: std::ffi::NulError) -> PdfError {
+        PdfError {
+            code: -1,
+            apiname: std::ffi::CString::new("std::ffi::CString").unwrap(),
+            message: std::ffi::CString::new(err.to_string()).unwrap(),
+        }
+    }
+}
+
+impl std::error::Error for PdfError {}
 
 #[cfg(test)]
 mod tests {
