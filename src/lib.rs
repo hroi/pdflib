@@ -6,6 +6,7 @@ pub struct Pdf {
 
 pub struct PdfError {
     code: i32,
+    apiname: std::ffi::CString,
     message: std::ffi::CString,
 }
 
@@ -19,7 +20,8 @@ impl fmt::Debug for PdfError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "pdf error {}: {}",
+            "{} error {}: {}",
+            self.apiname.to_string_lossy(),
             self.code,
             self.message.to_string_lossy()
         )
@@ -29,7 +31,8 @@ impl fmt::Debug for PdfError {
 impl std::convert::From<std::ffi::NulError> for PdfError {
     fn from(_: std::ffi::NulError) -> PdfError {
         PdfError {
-            code: 0,
+            code: -1,
+            apiname: std::ffi::CString::new("").unwrap(),
             message: std::ffi::CString::new("null bytes in input string").unwrap(),
         }
     }
@@ -65,9 +68,13 @@ macro_rules! unsafe_try_catch {
             pdflib_sys::PDF_CATCH!($p, {
                 let code = pdflib_sys::PDF_get_errnum($p);
                 assert!(code != 0);
-                let message = pdflib_sys::PDF_get_errmsg($p);
-                let message = std::ffi::CStr::from_ptr(message).to_owned();
-                return Err(PdfError { code, message });
+                let apiname = std::ffi::CStr::from_ptr(pdflib_sys::PDF_get_apiname($p)).to_owned();
+                let message = std::ffi::CStr::from_ptr(pdflib_sys::PDF_get_errmsg($p)).to_owned();
+                return Err(PdfError {
+                    code,
+                    apiname,
+                    message,
+                });
             });
         }
     };

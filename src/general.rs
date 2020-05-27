@@ -6,9 +6,15 @@ impl Pdf {
         unsafe {
             let code = pdflib_sys::PDF_get_errnum(self.inner);
             assert!(code != 0);
+            let apiname = pdflib_sys::PDF_get_apiname(self.inner);
+            let apiname = ffi::CStr::from_ptr(apiname).to_owned();
             let message = pdflib_sys::PDF_get_errmsg(self.inner);
             let message = ffi::CStr::from_ptr(message).to_owned();
-            PdfError { code, message }
+            PdfError {
+                code,
+                apiname,
+                message,
+            }
         }
     }
 }
