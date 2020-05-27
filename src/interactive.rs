@@ -1,5 +1,6 @@
 use super::{Pdf, PdfError};
 use std::ffi;
+use std::fmt;
 
 /// # Interactive Features
 /// ## Bookmarks
@@ -51,8 +52,16 @@ impl Pdf {
     }
 }
 pub struct Action {
-    pub handle: libc::c_int,
+    pub(crate) handle: libc::c_int,
 }
+
+// Required for interpolation in optionlists
+impl fmt::Display for Action {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.handle.fmt(f)
+    }
+}
+
 /// ## Actions
 impl Pdf {
     // pub unsafe extern "C" fn PDF_create_action(

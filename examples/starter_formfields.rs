@@ -41,10 +41,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let action = pdf.create_action("JavaScript", &format!("script[{}]={{{}}}", js.len(), js))?;
 
-    let pageopt = format!(
-        "width=a4.width height=a4.height action={{open={}}}",
-        action.handle
-    );
+    let pageopt = format!("width=a4.width height=a4.height action={{open={}}}", action);
     pdf.begin_page_ext(0., 0., &pageopt)?;
 
     let font = pdf.load_font("NotoSerif-Regular", "winansi", "simplefont")?;
@@ -55,7 +52,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let fieldopt = format!(
         "tooltip={{Date (will be filled automatically)}} bordercolor={{gray 0}} font={}",
-        font.handle
+        font
     );
     pdf.create_field(llx, lly, urx, ury, "date", "textfield", &fieldopt)?;
 
@@ -65,7 +62,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let fieldopt = format!(
         "tooltip={{Enter your name here}} bordercolor={{gray 0}} font={}",
-        font.handle
+        font
     );
     pdf.create_field(llx, lly, urx, ury, "name", "textfield", &fieldopt)?;
     pdf.end_page_ext("")?;

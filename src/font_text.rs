@@ -1,8 +1,16 @@
 use super::{Pdf, PdfError};
 use std::ffi;
+use std::fmt;
 
 pub struct Font {
-    pub handle: libc::c_int,
+    pub(crate) handle: libc::c_int,
+}
+
+// Required for interpolation in optionlists
+impl fmt::Display for Font {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        self.handle.fmt(f)
+    }
 }
 
 /// # Font and Text Functions
