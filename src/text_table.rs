@@ -1,6 +1,8 @@
 use super::{Pdf, PdfError};
 use std::ffi;
 
+/// # Text and Table Formatting
+/// ## Single-Line Text with Textlines
 impl Pdf {
     pub fn fit_textline(
         &mut self,

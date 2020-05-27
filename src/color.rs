@@ -2,6 +2,7 @@ use super::{Pdf, PdfError};
 use std::ffi;
 
 /// # Color Functions
+/// ## Setting Color
 impl Pdf {
     pub fn setcolor(
         &mut self,
