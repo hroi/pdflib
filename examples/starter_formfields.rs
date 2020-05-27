@@ -26,8 +26,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         date.value = d;;
     "##;
 
-    /* This means we must check return values of load_font() etc. */
-    pdf.set_option("errorpolicy", "return")?;
     pdf.set_option("SearchPath", &format!("{{{{{}}}}}", SEARCH_PATH))?;
 
     pdf.set_option("stringformat", "utf8")?;
