@@ -12,13 +12,16 @@ impl Pdf {
         filename: &str,
         optlist: &str,
     ) -> Result<Image, PdfError> {
+        let imagetype = ffi::CString::new(imagetype)?;
+        let filename = ffi::CString::new(filename)?;
+        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             let res = pdflib_sys::PDF_load_image(
                 self.inner,
-                ffi::CString::new(imagetype).unwrap().as_ptr(),
-                ffi::CString::new(filename).unwrap().as_ptr(),
+                imagetype.as_ptr(),
+                filename.as_ptr(),
                 0,
-                ffi::CString::new(optlist).unwrap().as_ptr(),
+                optlist.as_ptr(),
             );
             if res != -1 {
                 Ok(Image { inner: res })
@@ -35,15 +38,10 @@ impl Pdf {
         y: f64,
         optlist: &str,
     ) -> Result<(), PdfError> {
+        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             pdflib_sys::PDF_TRY!(self.inner, {
-                pdflib_sys::PDF_fit_image(
-                    self.inner,
-                    image.inner,
-                    x,
-                    y,
-                    ffi::CString::new(optlist).unwrap().as_ptr(),
-                );
+                pdflib_sys::PDF_fit_image(self.inner, image.inner, x, y, optlist.as_ptr());
             });
             pdflib_sys::PDF_CATCH!(self.inner, { return Err(self.get_error()) });
         }

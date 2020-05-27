@@ -24,14 +24,17 @@ impl Pdf {
         optlist: &str,
     ) -> Result<Font, PdfError> {
         let mut ret = Font { handle: 0 };
+        let fontname = ffi::CString::new(fontname)?;
+        let encoding = ffi::CString::new(encoding)?;
+        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             pdflib_sys::PDF_TRY!(self.inner, {
                 ret.handle = pdflib_sys::PDF_load_font(
                     self.inner,
-                    ffi::CString::new(fontname)?.as_ptr(),
+                    fontname.as_ptr(),
                     0,
-                    ffi::CString::new(encoding)?.as_ptr(),
-                    ffi::CString::new(optlist)?.as_ptr(),
+                    encoding.as_ptr(),
+                    optlist.as_ptr(),
                 );
             });
             pdflib_sys::PDF_CATCH!(self.inner, {

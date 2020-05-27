@@ -13,12 +13,14 @@ impl Pdf {
         c3: f64,
         c4: f64,
     ) -> Result<(), PdfError> {
+        let fstype = ffi::CString::new(fstype)?;
+        let colorspace = ffi::CString::new(colorspace)?;
         unsafe_try_catch!(
             self.inner,
             pdflib_sys::PDF_setcolor(
                 self.inner,
-                ffi::CString::new(fstype).unwrap().as_c_str().as_ptr(),
-                ffi::CString::new(colorspace).unwrap().as_c_str().as_ptr(),
+                fstype.as_ptr(),
+                colorspace.as_ptr(),
                 c1,
                 c2,
                 c3,

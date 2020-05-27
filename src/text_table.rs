@@ -11,16 +11,11 @@ impl Pdf {
         y: f64,
         optlist: &str,
     ) -> Result<(), PdfError> {
+        let text = ffi::CString::new(text)?;
+        let optlist = ffi::CString::new(optlist)?;
         unsafe_try_catch!(
             self.inner,
-            pdflib_sys::PDF_fit_textline(
-                self.inner,
-                ffi::CString::new(text).unwrap().as_ptr(),
-                0,
-                x,
-                y,
-                ffi::CString::new(optlist).unwrap().as_ptr(),
-            )
+            pdflib_sys::PDF_fit_textline(self.inner, text.as_ptr(), 0, x, y, optlist.as_ptr())
         );
         Ok(())
     }

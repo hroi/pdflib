@@ -20,6 +20,9 @@ impl Pdf {
         type_: &str,
         optlist: &str,
     ) -> Result<(), PdfError> {
+        let name = ffi::CString::new(name)?;
+        let type_ = ffi::CString::new(type_)?;
+        let optlist = ffi::CString::new(optlist)?;
         unsafe_try_catch!(
             self.inner,
             pdflib_sys::PDF_create_field(
@@ -28,10 +31,10 @@ impl Pdf {
                 lly,
                 urx,
                 ury,
-                ffi::CString::new(name)?.as_ptr(),
+                name.as_ptr(),
                 0,
-                ffi::CString::new(type_,)?.as_ptr(),
-                ffi::CString::new(optlist)?.as_ptr(),
+                type_.as_ptr(),
+                optlist.as_ptr(),
             )
         );
         Ok(())
@@ -39,14 +42,11 @@ impl Pdf {
 
     /// Create a form field group subject to various options.
     pub fn create_fieldgroup(&mut self, name: &str, optlist: &str) -> Result<(), PdfError> {
+        let name = ffi::CString::new(name)?;
+        let optlist = ffi::CString::new(optlist)?;
         unsafe_try_catch!(
             self.inner,
-            pdflib_sys::PDF_create_fieldgroup(
-                self.inner,
-                ffi::CString::new(name)?.as_ptr(),
-                0,
-                ffi::CString::new(optlist)?.as_ptr(),
-            )
+            pdflib_sys::PDF_create_fieldgroup(self.inner, name.as_ptr(), 0, optlist.as_ptr())
         );
         Ok(())
     }
@@ -71,13 +71,12 @@ impl Pdf {
     // ) -> c_int
     pub fn create_action(&mut self, type_: &str, optlist: &str) -> Result<Action, PdfError> {
         let mut ret = Action { handle: 0 };
+        let type_ = ffi::CString::new(type_)?;
+        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             pdflib_sys::PDF_TRY!(self.inner, {
-                ret.handle = pdflib_sys::PDF_create_action(
-                    self.inner,
-                    ffi::CString::new(type_)?.as_ptr(),
-                    ffi::CString::new(optlist)?.as_ptr(),
-                );
+                ret.handle =
+                    pdflib_sys::PDF_create_action(self.inner, type_.as_ptr(), optlist.as_ptr());
             });
             pdflib_sys::PDF_CATCH!(
                 self.inner,
