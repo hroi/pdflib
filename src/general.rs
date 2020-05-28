@@ -26,14 +26,11 @@ impl Pdf {}
 impl Pdf {}
 /// ## Global Options
 impl Pdf {
-    fn format_option(k: &str, v: &str) -> Result<ffi::CString, PdfError> {
-        Ok(ffi::CString::new(format!("{}={}", k, v))?)
-    }
-
-    pub fn set_option(&mut self, k: &str, v: &str) -> Result<(), PdfError> {
+    pub fn set_option(&mut self, optlist: &str) -> Result<(), PdfError> {
+        let optlist = ffi::CString::new(optlist)?;
         unsafe_try_catch!(
             self.inner,
-            pdflib_sys::PDF_set_option(self.inner, Self::format_option(k, v)?.as_ptr())
+            pdflib_sys::PDF_set_option(self.inner, optlist.as_ptr())
         );
         Ok(())
     }

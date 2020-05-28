@@ -14,9 +14,6 @@
 use pdflib::Pdf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /* This is where the data files are. Adjust as necessary. */
-    const SEARCH_PATH: &str = "./pdflib-sys/pdflib/bind/data";
-
     let mut pdf = Pdf::new();
     let (llx, mut lly, urx, mut ury) = (150., 550., 350., 575.);
 
@@ -26,9 +23,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         date.value = d;;
     "##;
 
-    pdf.set_option("SearchPath", &format!("{{{{{}}}}}", SEARCH_PATH))?;
+    pdf.set_option(concat!("SearchPath={{", env!("PDFLIB_DIR"), "/bind/data}}"))?;
 
-    pdf.set_option("stringformat", "utf8")?;
+    pdf.set_option("stringformat=utf8")?;
 
     /* Prevent changes with a master password */
     pdf.begin_document(

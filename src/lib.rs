@@ -62,8 +62,8 @@ impl Pdf {
             p
         };
         let mut ret = Pdf { inner: p };
-        ret.set_option("errorpolicy", "return").unwrap();
-        ret.set_option("stringformat", "utf8").unwrap();
+        ret.set_option("errorpolicy=return").unwrap();
+        ret.set_option("stringformat=utf8").unwrap();
         ret
     }
 }
@@ -123,21 +123,20 @@ mod tests {
     #[test]
     fn set_option() {
         let mut pdf = Pdf::new();
-        pdf.set_option("filenamehandling", "unicode").unwrap();
+        pdf.set_option("filenamehandling=unicode").unwrap();
     }
 
     #[test]
     #[should_panic]
     fn nullbyte_arg() {
         let mut pdf = Pdf::new();
-        pdf.set_option("filename\0handling", "contains null")
-            .unwrap();
+        pdf.set_option("filename\0handling=contains null").unwrap();
     }
 
     #[test]
     #[should_panic]
     fn set_option_invalid() {
         let mut pdf = Pdf::new();
-        pdf.set_option("invalid", "option").unwrap();
+        pdf.set_option("invalid=option").unwrap();
     }
 }

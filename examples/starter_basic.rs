@@ -14,8 +14,8 @@ const IMAGEFILE: &str = "nesrin.jpg";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut p = Pdf::new();
 
-    p.set_option("errorpolicy", "return")?;
-    p.set_option("SearchPath", "{{./pdflib-sys/pdflib/bind/data}}")?;
+    p.set_option("errorpolicy=return")?;
+    p.set_option(concat!("SearchPath={{", env!("PDFLIB_DIR"), "/bind/data}}"))?;
 
     p.begin_document("starter_basic.pdf", "")?;
 
