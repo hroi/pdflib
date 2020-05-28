@@ -4,15 +4,16 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() {
-    for (k, v) in env::vars() {
-        eprintln!("{:?} -> {:?}", k, v);
-    }
+    // for (k, v) in env::vars() {
+    //     eprintln!("{:?} -> {:?}", k, v);
+    // }
     env::set_var("LLVM_CONFIG_PATH", "/usr/local/opt/llvm/bin/llvm-config");
 
-    println!(
-        "cargo:rustc-link-search=native={}/pdflib/bind/c/lib/",
-        env::var("CARGO_MANIFEST_DIR").unwrap()
-    );
+    if let Ok(pdflibdir) = env::var("PDFLIB_LIBDIR") {
+        println!("cargo:rustc-link-search=native={}", pdflibdir);
+    } else {
+        println!("cargo:warning=PDFLIB_LIB env var not set. Please point PDFLIB_LIBDIR to the directory containing pdflib.a file.");
+    }
     println!("cargo:rustc-link-lib=pdf");
 
     let target = std::env::var("TARGET").unwrap();
