@@ -9,10 +9,10 @@ fn main() {
     // }
     env::set_var("LLVM_CONFIG_PATH", "/usr/local/opt/llvm/bin/llvm-config");
 
-    if let Ok(pdflibdir) = env::var("PDFLIB_LIBDIR") {
-        println!("cargo:rustc-link-search=native={}", pdflibdir);
+    if let Ok(pdflibdir) = env::var("PDFLIB_DIR") {
+        println!("cargo:rustc-link-search=native={}/bind/c/lib", pdflibdir);
     } else {
-        println!("cargo:warning=PDFLIB_LIB env var not set. Please point PDFLIB_LIBDIR to the directory containing pdflib.a file.");
+        println!("cargo:warning=PDFLIB_DIR env var not set. Please point PDFLIB_DIR to the directory containing pdflib.a file.");
     }
     println!("cargo:rustc-link-lib=pdf");
 
@@ -36,7 +36,10 @@ fn main() {
         // The input header we would like to generate
         // bindings for.
         .header("wrapper.h")
-        .clang_arg("-I./pdflib/bind/c/include")
+        .clang_arg(format!(
+            "-I{}/bind/c/include",
+            env::var("PDFLIB_DIR").unwrap_or_else(|_| ".".to_string())
+        ))
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks))
