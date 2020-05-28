@@ -5,8 +5,37 @@ use std::fmt;
 /// # Interactive Features
 /// ## Bookmarks
 impl Pdf {}
+
 /// ## Annotations
-impl Pdf {}
+impl Pdf {
+    /// Create an annotation on the current page.
+    pub fn create_annotation(
+        &mut self,
+        llx: f64,
+        lly: f64,
+        urx: f64,
+        ury: f64,
+        type_: &str,
+        optlist: &str,
+    ) -> Result<(), PdfError> {
+        let type_ = ffi::CString::new(type_)?;
+        let optlist = ffi::CString::new(optlist)?;
+        unsafe_try_catch!(
+            self.inner,
+            pdflib_sys::PDF_create_annotation(
+                self.inner,
+                llx,
+                lly,
+                urx,
+                ury,
+                type_.as_ptr(),
+                optlist.as_ptr(),
+            )
+        );
+        Ok(())
+    }
+}
+
 /// ## Form Fields
 impl Pdf {
     /// Create a form field on the current page subject to various options.
