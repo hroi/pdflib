@@ -7,5 +7,5 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-pdflib-sys = {path = "./pdflib-sys"}
-libc = "0.2.70"
+pdflib-sys = { path = "./pdflib-sys" }
+libc = "0.2.71"

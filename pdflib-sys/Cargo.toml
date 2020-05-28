@@ -12,4 +12,4 @@ categories = ["external-ffi-bindings"]
 bindgen = { version = "0.54.0", default-features = false }
 
 [dependencies]
-libc = "0.2.70"
+libc = "0.2.71"
