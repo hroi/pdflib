@@ -94,11 +94,6 @@ impl fmt::Display for Action {
 
 /// ## Actions
 impl Pdf {
-    // pub unsafe extern "C" fn PDF_create_action(
-    //     p: *mut PDF,
-    //     type_: *const c_char,
-    //     optlist: *const c_char
-    // ) -> c_int
     pub fn create_action(&mut self, type_: &str, optlist: &str) -> Result<Action, PdfError> {
         let mut ret = Action { handle: 0 };
         let type_ = ffi::CString::new(type_)?;
