@@ -9,7 +9,7 @@ categories = ["external-ffi-bindings"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-bindgen = "0.54.0"
+bindgen = { version = "0.54.0", default-features = false }
 
 [dependencies]
 libc = "0.2.70"
