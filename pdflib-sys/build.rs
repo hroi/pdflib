@@ -12,7 +12,7 @@ fn main() {
     if let Ok(pdflibdir) = env::var("PDFLIB_DIR") {
         println!("cargo:rustc-link-search=native={}/bind/c/lib", pdflibdir);
     } else {
-        println!("cargo:warning=PDFLIB_DIR env var not set. Please point PDFLIB_DIR to the directory containing pdflib.a file.");
+        println!("cargo:warning=PDFLIB_DIR env var not set. Please point PDFLIB_DIR to the directory containing pdflib C/C++ binary distribution.");
     }
     println!("cargo:rustc-link-lib=pdf");
 
