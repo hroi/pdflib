@@ -1,6 +1,7 @@
 use super::{Pdf, PdfError};
 use std::ffi;
 use std::fmt;
+use std::ptr;
 
 pub struct Document {
     pub(crate) handle: libc::c_int,
@@ -155,5 +156,59 @@ impl Pdf {
             }
         }
         Ok(())
+    }
+}
+
+/// ## pCOS Functions
+impl Pdf {
+    /// Get the value of a pCOS path with type number or boolean.
+    pub fn pcos_get_number(&mut self, doc: &Document, path: &str) -> Result<f64, PdfError> {
+        let path = ffi::CString::new(path)?;
+        let mut ret: f64 = 0.0;
+        unsafe_try_catch!(
+            self.inner,
+            ret = pdflib_sys::PDF_pcos_get_number(self.inner, doc.handle, path.as_ptr())
+        );
+        Ok(ret)
+    }
+
+    /// Get the value of a pCOS path with type name, number, string, or boolean.
+    pub fn pcos_get_string(&mut self, doc: &Document, path: &str) -> Result<String, PdfError> {
+        let path = ffi::CString::new(path)?;
+        let mut s: *const libc::c_char = ptr::null();
+        unsafe_try_catch!(self.inner, {
+            s = pdflib_sys::PDF_pcos_get_string(self.inner, doc.handle, path.as_ptr());
+        });
+        unsafe {
+            let owned = ffi::CString::from(ffi::CStr::from_ptr(s));
+            let ret = owned.into_string()?;
+            Ok(ret)
+        }
+    }
+
+    /// Get the contents of a pCOS path with type stream, fstream, or string.
+    pub fn pcos_get_stream(
+        &mut self,
+        doc: &Document,
+        optlist: &str,
+        path: &str,
+    ) -> Result<Vec<u8>, PdfError> {
+        let optlist = ffi::CString::new(optlist)?;
+        let path = ffi::CString::new(path)?;
+        let mut stream_len = 0;
+        let mut stream_ptr: *const u8 = ptr::null();
+        unsafe_try_catch!(
+            self.inner,
+            stream_ptr = pdflib_sys::PDF_pcos_get_stream(
+                self.inner,
+                doc.handle,
+                &mut stream_len,
+                optlist.as_ptr(),
+                path.as_ptr()
+            )
+        );
+        assert!(!stream_ptr.is_null());
+        let slice = unsafe { std::slice::from_raw_parts(stream_ptr, stream_len as usize) };
+        Ok(slice.to_vec())
     }
 }

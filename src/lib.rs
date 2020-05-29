@@ -110,6 +110,16 @@ impl std::convert::From<std::ffi::NulError> for PdfError {
     }
 }
 
+impl std::convert::From<std::ffi::IntoStringError> for PdfError {
+    fn from(err: std::ffi::IntoStringError) -> PdfError {
+        PdfError {
+            code: -1,
+            apiname: std::ffi::CString::new("std::ffi::CString").unwrap(),
+            message: std::ffi::CString::new(err.to_string()).unwrap(),
+        }
+    }
+}
+
 impl std::error::Error for PdfError {}
 
 #[cfg(test)]
