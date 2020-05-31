@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let image = p.load_image("auto", IMAGEFILE, "")?;
 
     /* Page 1 */
-    p.begin_page_ext(0., 0., "width=a4.width height=a4.height")?;
+    p.begin_page_ext(pdflib::A4_WIDTH, pdflib::A4_HEIGHT, "")?;
     /* use NotoSerif-Regular font with text format UTF-8 for placing the text
      * and demonstrate various options how to pass the UTF-8 text to PDFlib
      */

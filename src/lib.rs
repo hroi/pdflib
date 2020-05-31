@@ -19,6 +19,9 @@ macro_rules! unsafe_try_catch {
     };
 }
 
+mod consts;
+pub use consts::*;
+
 mod general;
 pub use general::*;
 mod document_page;
