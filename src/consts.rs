@@ -1,4 +1,4 @@
-/// Paper sizes
+// Paper sizes
 pub use pdflib_sys::a0_height as A0_HEIGHT;
 pub use pdflib_sys::a0_width as A0_WIDTH;
 pub use pdflib_sys::a1_height as A1_HEIGHT;
@@ -24,7 +24,7 @@ pub use pdflib_sys::letter_width as LETTER_WIDTH;
 pub use pdflib_sys::p11x17_height as P11X17_HEIGHT;
 pub use pdflib_sys::p11x17_width as P11X17_WIDTH;
 
-/// Object types
+// Object types
 pub use pdflib_sys::pcos_object_type_pcos_ot_array as PCOS_OT_ARRAY;
 pub use pdflib_sys::pcos_object_type_pcos_ot_boolean as PCOS_OT_BOOLEAN;
 pub use pdflib_sys::pcos_object_type_pcos_ot_dict as PCOS_OT_DICT;
