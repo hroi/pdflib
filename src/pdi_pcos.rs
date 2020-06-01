@@ -1,4 +1,4 @@
-use super::{Pdf, PdfError};
+use super::{OptionList, Pdf, PdfError};
 use std::ffi;
 use std::fmt;
 use std::ptr;
@@ -20,16 +20,15 @@ impl Pdf {
     pub fn open_pdi_document(
         &mut self,
         filename: &str,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<Document, PdfError> {
         let filename = ffi::CString::new(filename)?;
-        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             let handle = pdflib_sys::PDF_open_pdi_document(
                 self.inner,
                 filename.as_ptr(),
                 0,
-                optlist.as_ptr(),
+                optlist.into().as_ptr(),
             );
             if handle == -1 {
                 Err(self.get_error())
@@ -65,12 +64,15 @@ impl Pdf {
         &mut self,
         doc: &Document,
         pagenumber: i32,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<Page, PdfError> {
-        let optlist = ffi::CString::new(optlist)?;
         unsafe {
-            let handle =
-                pdflib_sys::PDF_open_pdi_page(self.inner, doc.handle, pagenumber, optlist.as_ptr());
+            let handle = pdflib_sys::PDF_open_pdi_page(
+                self.inner,
+                doc.handle,
+                pagenumber,
+                optlist.into().as_ptr(),
+            );
             if handle == -1 {
                 Err(self.get_error())
             } else {
@@ -95,12 +97,11 @@ impl Pdf {
         page: &Page,
         x: f64,
         y: f64,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<(), PdfError> {
-        let optlist = ffi::CString::new(optlist)?;
         unsafe_try_catch!(
             self.inner,
-            pdflib_sys::PDF_fit_pdi_page(self.inner, page.handle, x, y, optlist.as_ptr())
+            pdflib_sys::PDF_fit_pdi_page(self.inner, page.handle, x, y, optlist.into().as_ptr())
         );
         Ok(())
     }
@@ -117,17 +118,16 @@ impl Pdf {
         &mut self,
         page: &Page,
         keyword: &str,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<f64, PdfError> {
         let keyword = ffi::CString::new(keyword)?;
-        let optlist = ffi::CString::new(optlist)?;
         let mut ret: f64 = 0.;
         unsafe_try_catch!(self.inner, {
             ret = pdflib_sys::PDF_info_pdi_page(
                 self.inner,
                 page.handle,
                 keyword.as_ptr(),
-                optlist.as_ptr(),
+                optlist.into().as_ptr(),
             )
         });
         Ok(ret)
@@ -141,15 +141,14 @@ impl Pdf {
         &mut self,
         doc: &Document,
         page: Option<&Page>,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<(), PdfError> {
-        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             let ret = pdflib_sys::PDF_process_pdi(
                 self.inner,
                 doc.handle,
                 page.map(|p| p.handle).unwrap_or(-1),
-                optlist.as_ptr(),
+                optlist.into().as_ptr(),
             );
             if ret == -1 {
                 return Err(self.get_error());
@@ -190,10 +189,9 @@ impl Pdf {
     pub fn pcos_get_stream(
         &mut self,
         doc: &Document,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
         path: &str,
     ) -> Result<Vec<u8>, PdfError> {
-        let optlist = ffi::CString::new(optlist)?;
         let path = ffi::CString::new(path)?;
         let mut stream_len = 0;
         let mut stream_ptr: *const u8 = ptr::null();
@@ -203,7 +201,7 @@ impl Pdf {
                 self.inner,
                 doc.handle,
                 &mut stream_len,
-                optlist.as_ptr(),
+                optlist.into().as_ptr(),
                 path.as_ptr()
             )
         );

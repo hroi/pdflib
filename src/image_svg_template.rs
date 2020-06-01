@@ -1,4 +1,4 @@
-use super::{Pdf, PdfError};
+use super::{OptionList, Pdf, PdfError};
 use std::ffi;
 pub struct Image {
     pub(crate) inner: libc::c_int,
@@ -10,18 +10,17 @@ impl Pdf {
         &mut self,
         imagetype: &str,
         filename: &str,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<Image, PdfError> {
         let imagetype = ffi::CString::new(imagetype)?;
         let filename = ffi::CString::new(filename)?;
-        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             let res = pdflib_sys::PDF_load_image(
                 self.inner,
                 imagetype.as_ptr(),
                 filename.as_ptr(),
                 0,
-                optlist.as_ptr(),
+                optlist.into().as_ptr(),
             );
             if res != -1 {
                 Ok(Image { inner: res })
@@ -36,12 +35,11 @@ impl Pdf {
         image: &Image,
         x: f64,
         y: f64,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<(), PdfError> {
-        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             pdflib_sys::PDF_TRY!(self.inner, {
-                pdflib_sys::PDF_fit_image(self.inner, image.inner, x, y, optlist.as_ptr());
+                pdflib_sys::PDF_fit_image(self.inner, image.inner, x, y, optlist.into().as_ptr());
             });
             pdflib_sys::PDF_CATCH!(self.inner, { return Err(self.get_error()) });
         }

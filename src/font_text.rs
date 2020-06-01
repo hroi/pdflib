@@ -1,4 +1,4 @@
-use super::{Pdf, PdfError};
+use super::{OptionList, Pdf, PdfError};
 use std::ffi;
 use std::fmt;
 
@@ -21,12 +21,11 @@ impl Pdf {
         &mut self,
         fontname: &str,
         encoding: &str,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<Font, PdfError> {
         let mut ret = Font { handle: 0 };
         let fontname = ffi::CString::new(fontname)?;
         let encoding = ffi::CString::new(encoding)?;
-        let optlist = ffi::CString::new(optlist)?;
         unsafe {
             pdflib_sys::PDF_TRY!(self.inner, {
                 ret.handle = pdflib_sys::PDF_load_font(
@@ -34,7 +33,7 @@ impl Pdf {
                     fontname.as_ptr(),
                     0,
                     encoding.as_ptr(),
-                    optlist.as_ptr(),
+                    optlist.into().as_ptr(),
                 );
             });
             pdflib_sys::PDF_CATCH!(self.inner, {

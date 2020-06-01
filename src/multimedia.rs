@@ -1,4 +1,4 @@
-use super::{Pdf, PdfError};
+use super::{OptionList, Pdf, PdfError};
 use std::ffi;
 use std::fmt;
 
@@ -21,11 +21,10 @@ impl Pdf {
         &mut self,
         type_: &str,
         filename: &str,
-        optlist: &str,
+        optlist: impl Into<OptionList>,
     ) -> Result<Asset, PdfError> {
         let type_ = ffi::CString::new(type_)?;
         let filename = ffi::CString::new(filename)?;
-        let optlist = ffi::CString::new(optlist)?;
         let handle: libc::c_int;
         unsafe {
             handle = pdflib_sys::PDF_load_asset(
@@ -33,7 +32,7 @@ impl Pdf {
                 type_.as_ptr(),
                 filename.as_ptr(),
                 0,
-                optlist.as_ptr(),
+                optlist.into().as_ptr(),
             );
             if handle == -1 {
                 return Err(self.get_error());

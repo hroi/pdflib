@@ -1,3 +1,5 @@
+use std::convert::From;
+use std::ffi;
 use std::fmt;
 
 macro_rules! unsafe_try_catch {
@@ -18,6 +20,9 @@ macro_rules! unsafe_try_catch {
         }
     };
 }
+
+mod optionlist;
+pub use optionlist::*;
 
 mod consts;
 pub use consts::*;
@@ -103,22 +108,22 @@ impl fmt::Debug for PdfError {
     }
 }
 
-impl std::convert::From<std::ffi::NulError> for PdfError {
-    fn from(err: std::ffi::NulError) -> PdfError {
+impl From<ffi::NulError> for PdfError {
+    fn from(err: ffi::NulError) -> PdfError {
         PdfError {
             code: -1,
-            apiname: std::ffi::CString::new("std::ffi::CString").unwrap(),
-            message: std::ffi::CString::new(err.to_string()).unwrap(),
+            apiname: ffi::CString::new("std::ffi::CString").unwrap(),
+            message: ffi::CString::new(err.to_string()).unwrap(),
         }
     }
 }
 
-impl std::convert::From<std::ffi::IntoStringError> for PdfError {
-    fn from(err: std::ffi::IntoStringError) -> PdfError {
+impl From<ffi::IntoStringError> for PdfError {
+    fn from(err: ffi::IntoStringError) -> PdfError {
         PdfError {
             code: -1,
-            apiname: std::ffi::CString::new("std::ffi::CString").unwrap(),
-            message: std::ffi::CString::new(err.to_string()).unwrap(),
+            apiname: ffi::CString::new("std::ffi::CString").unwrap(),
+            message: ffi::CString::new(err.to_string()).unwrap(),
         }
     }
 }
